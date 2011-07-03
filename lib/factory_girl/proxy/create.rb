@@ -11,6 +11,12 @@ module FactoryGirl
         run_callbacks(:after_create)
         @instance
       end
+
+      private
+      def get_strategy(overrides)
+        overrides.delete(:build_create)
+        Proxy::Create
+      end
     end
   end
 end

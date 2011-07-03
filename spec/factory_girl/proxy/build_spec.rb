@@ -27,6 +27,35 @@ describe FactoryGirl::Proxy::Build do
       @proxy.associate(:owner, :user, @overrides)
     end
 
+    it "should build the associated instance" do
+      @associated_factory.should have_received.run(FactoryGirl::Proxy::Build, @overrides)
+    end
+
+    it "should set the associated instance" do
+      @instance.should have_received.method_missing(:owner=, @association)
+    end
+  end
+
+  it "should run build when building an association" do
+    association = "associated-instance"
+    associated_factory = "associated-factory"
+    stub(FactoryGirl).factory_by_name { associated_factory }
+    stub(associated_factory).run { association }
+    overrides = { 'attr' => 'value' }
+    @proxy.association(:user, overrides).should == association
+    associated_factory.should have_received.run(FactoryGirl::Proxy::Build, overrides)
+  end
+
+  describe "when asked to associate with another factory with build_create true" do
+    before do
+      @association = "associated-instance"
+      @associated_factory = "associated-factory"
+      stub(FactoryGirl).factory_by_name { @associated_factory }
+      stub(@associated_factory).run { @association }
+      @overrides = { 'attr' => 'value', :build_create => true }
+      @proxy.associate(:owner, :user, @overrides)
+    end
+
     it "should create the associated instance" do
       @associated_factory.should have_received.run(FactoryGirl::Proxy::Create, @overrides)
     end
@@ -36,12 +65,12 @@ describe FactoryGirl::Proxy::Build do
     end
   end
 
-  it "should run create when building an association" do
+  it "should run create when building an association with build_create true" do
     association = "associated-instance"
     associated_factory = "associated-factory"
     stub(FactoryGirl).factory_by_name { associated_factory }
     stub(associated_factory).run { association }
-    overrides = { 'attr' => 'value' }
+    overrides = { 'attr' => 'value', :build_create => true }
     @proxy.association(:user, overrides).should == association
     associated_factory.should have_received.run(FactoryGirl::Proxy::Create, overrides)
   end

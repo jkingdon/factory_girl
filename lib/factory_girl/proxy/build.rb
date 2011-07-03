@@ -14,18 +14,26 @@ module FactoryGirl
       end
 
       def associate(name, factory_name, overrides)
+        strategy = get_strategy(overrides)
         factory = FactoryGirl.factory_by_name(factory_name)
-        set(name, factory.run(Proxy::Create, overrides))
+        set(name, factory.run(strategy, overrides))
       end
 
       def association(factory_name, overrides = {})
+        strategy = get_strategy(overrides)
         factory = FactoryGirl.factory_by_name(factory_name)
-        factory.run(Proxy::Create, overrides)
+        factory.run(strategy, overrides)
       end
 
       def result(to_create)
         run_callbacks(:after_build)
         @instance
+      end
+
+      private
+      def get_strategy(overrides)
+        build_create = overrides.delete(:build_create)
+        strategy = build_create ? Proxy::Create : Proxy::Build
       end
     end
   end

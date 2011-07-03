@@ -26,6 +26,33 @@ describe "a built instance" do
     should be_new_record
   end
 
+  it "assigns and does not save associations" do
+    subject.user.should be_kind_of(User)
+    subject.user.should be_new_record
+  end
+end
+
+describe "a built instance with build_create set" do
+  include FactoryGirl::Syntax::Methods
+
+  before do
+    define_model('User')
+
+    define_model('Post', :user_id => :integer) do
+      belongs_to :user
+    end
+
+    FactoryGirl.define do
+      factory :user
+
+      factory :post do
+        association(:user, :build_create => true)
+      end
+    end
+  end
+
+  subject { build(:post) }
+
   it "assigns and saves associations" do
     subject.user.should be_kind_of(User)
     subject.user.should_not be_new_record
