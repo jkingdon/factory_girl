@@ -173,6 +173,18 @@ The behavior of the association method varies depending on the build strategy us
     post.new_record?       # => false
     post.author.new_record # => false
 
+    # Builds a User, and then builds a Post, but does not save either
+    post = FactoryGirl.build(:post)
+    post.new_record?       # => true
+    post.author.new_record # => false
+
+To save the associated object when building, specify build_create in the factory:
+
+    factory :post do
+      # ...
+      association :author, :factory => :user, :build_create => true
+    end
+
     # Builds and saves a User, and then builds but does not save a Post
     post = FactoryGirl.build(:post)
     post.new_record?       # => true
