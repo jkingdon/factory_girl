@@ -32,6 +32,31 @@ describe "a created instance" do
   end
 end
 
+describe "a created instance, specifying :method => build" do
+  include FactoryGirl::Syntax::Methods
+
+  before do
+    define_model('User')
+
+    define_model('Post', :user_id => :integer) do
+      belongs_to :user
+    end
+
+    FactoryGirl.define do
+      factory :user
+
+      factory :post do
+        association(:user, :method => :build)
+      end
+    end
+  end
+
+  it "complains" do
+    lambda { create('post') }.should raise_error(
+      "cannot specify :method => :build when creating a record")
+  end
+end
+
 describe "a custom create" do
   include FactoryGirl::Syntax::Methods
 

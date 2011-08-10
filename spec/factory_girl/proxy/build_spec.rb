@@ -46,6 +46,48 @@ describe FactoryGirl::Proxy::Build do
     associated_factory.should have_received.run(FactoryGirl::Proxy::Create, overrides)
   end
 
+  context "when the association specifies :method => build" do
+    before do
+      @association = "associated-instance"
+      @associated_factory = "associated-factory"
+      stub(FactoryGirl).factory_by_name { @associated_factory }
+      stub(@associated_factory).run { @association }
+      @overrides = { 'attr' => 'value', :method => :build }
+    end
+
+    it "association should run build" do
+      @proxy.association(:user, @overrides).should == @association
+      @associated_factory.should have_received.run(FactoryGirl::Proxy::Build, @overrides)
+    end
+
+    it "associate should run build" do
+      @proxy.associate(:owner, :user, @overrides)
+      @associated_factory.should have_received.run(FactoryGirl::Proxy::Build, @overrides)
+      @instance.should have_received.method_missing(:owner=, @association)
+    end
+  end
+
+  describe "specifying method" do
+    it "defaults to create" do
+      @proxy.send(:get_method, {}).should == FactoryGirl::Proxy::Create
+    end
+
+    it "can specify create explicitly" do
+      @proxy.send(:get_method, {:method => :create }).should ==
+        FactoryGirl::Proxy::Create
+    end
+
+    it "can specify build explicitly" do
+      @proxy.send(:get_method, {:method => :build }).should ==
+        FactoryGirl::Proxy::Build
+    end
+
+    it "complains if method is unrecognized" do
+      lambda { @proxy.send(:get_method, {:method => :froboznicate }) }.
+        should raise_error("unrecognized method froboznicate")
+    end
+  end
+
   it "should return the built instance when asked for the result" do
     @proxy.result(nil).should == @instance
   end

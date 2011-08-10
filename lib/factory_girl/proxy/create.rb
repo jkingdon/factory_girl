@@ -11,6 +11,14 @@ module FactoryGirl
         run_callbacks(:after_create)
         @instance
       end
+
+      def get_method(overrides)
+        method = parse_method(overrides)
+        if FactoryGirl::Proxy::Build == method
+          raise "cannot specify :method => :build when creating a record"
+        end
+        method
+      end
     end
   end
 end
