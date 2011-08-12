@@ -12,8 +12,8 @@ module FactoryGirl
         @instance
       end
 
-      def get_method(overrides)
-        method = parse_method(overrides)
+      def get_method(method_string)
+        method = parse_method(method_string)
         if FactoryGirl::Proxy::Build == method
           raise "cannot specify :method => :build when creating a record"
         end

@@ -57,33 +57,44 @@ describe FactoryGirl::Proxy::Build do
 
     it "association should run build" do
       @proxy.association(:user, @overrides).should == @association
-      @associated_factory.should have_received.run(FactoryGirl::Proxy::Build, @overrides)
+      @associated_factory.should have_received.
+        run(FactoryGirl::Proxy::Build, { 'attr' => 'value'})
     end
 
     it "associate should run build" do
       @proxy.associate(:owner, :user, @overrides)
-      @associated_factory.should have_received.run(FactoryGirl::Proxy::Build, @overrides)
+      @associated_factory.should have_received.
+        run(FactoryGirl::Proxy::Build, { 'attr' => 'value'})
       @instance.should have_received.method_missing(:owner=, @association)
+    end
+
+    it "associate should run build even when run more than once" do
+      @proxy.associate(:owner, :user, @overrides)
+      @proxy.associate(:owner, :user, @overrides)
+      @associated_factory.should have_received.
+        run(FactoryGirl::Proxy::Build, { 'attr' => 'value'}).twice
+      @associated_factory.should_not have_received.run(FactoryGirl::Proxy::Create, @overrides)
+      @instance.should have_received.method_missing(:owner=, @association).twice
     end
   end
 
   describe "specifying method" do
     it "defaults to create" do
-      @proxy.send(:get_method, {}).should == FactoryGirl::Proxy::Create
+      @proxy.send(:get_method, nil).should == FactoryGirl::Proxy::Create
     end
 
     it "can specify create explicitly" do
-      @proxy.send(:get_method, {:method => :create }).should ==
+      @proxy.send(:get_method, :create).should ==
         FactoryGirl::Proxy::Create
     end
 
     it "can specify build explicitly" do
-      @proxy.send(:get_method, {:method => :build }).should ==
+      @proxy.send(:get_method, :build).should ==
         FactoryGirl::Proxy::Build
     end
 
     it "complains if method is unrecognized" do
-      lambda { @proxy.send(:get_method, {:method => :froboznicate }) }.
+      lambda { @proxy.send(:get_method, :froboznicate) }.
         should raise_error("unrecognized method froboznicate")
     end
   end
