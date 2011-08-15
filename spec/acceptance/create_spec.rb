@@ -51,9 +51,11 @@ describe "a created instance, specifying :method => build" do
     end
   end
 
-  it "complains" do
-    lambda { create('post') }.should raise_error(
-      "cannot specify :method => :build when creating a record")
+  subject { create('post') }
+
+  it "still saves associations (:method => :build only affects build, not create)" do
+    subject.user.should be_kind_of(User)
+    subject.user.should_not be_new_record
   end
 end
 

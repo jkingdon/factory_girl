@@ -13,11 +13,9 @@ module FactoryGirl
       end
 
       def get_method(method_string)
-        method = parse_method(method_string)
-        if FactoryGirl::Proxy::Build == method
-          raise "cannot specify :method => :build when creating a record"
-        end
-        method
+        # Leaving this as Proxy::Build in the :method => :build case
+        # is a bit strange, but does it have any user-visible behaviors?
+        parse_method(method_string)
       end
     end
   end
