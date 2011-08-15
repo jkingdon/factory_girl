@@ -45,9 +45,28 @@ describe FactoryGirl::Proxy::Stub do
       end
     end
 
+    describe "when asked to associate with :method => :build" do
+      before do
+        stub(@instance).owner { @user }
+        mock(@associated_factory).run(FactoryGirl::Proxy::Stub, {}) { @user }
+        mock(@stub).set(:owner, @user)
+
+        @stub.associate(:owner, :user, { :method => :build })
+      end
+
+      it "should set a value for the association" do
+        @stub.result(nil).owner.should == @user
+      end
+    end
+
     it "should return the association when building one" do
       mock(@associated_factory).run(FactoryGirl::Proxy::Stub, {}) { @user }
       @stub.association(:user).should == @user
+    end
+
+    it "should return the association when building one" do
+      mock(@associated_factory).run(FactoryGirl::Proxy::Stub, {}) { @user }
+      @stub.association(:user, { :method => :build }).should == @user
     end
 
     describe "when asked for the result" do

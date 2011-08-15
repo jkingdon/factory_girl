@@ -1,7 +1,7 @@
 require 'spec_helper'
 require 'acceptance/acceptance_helper'
 
-describe "a built instance" do
+describe "a stubbed instance" do
   include FactoryGirl::Syntax::Methods
 
   before do
@@ -20,19 +20,19 @@ describe "a built instance" do
     end
   end
 
-  subject { build(:post) }
+  subject { build_stubbed(:post) }
 
-  it "isn't saved" do
-    should be_new_record
+  it "acts as if it came from the database" do
+    should_not be_new_record
   end
 
-  it "assigns and saves associations" do
+  it "assigns associations and acts as if it is saved" do
     subject.user.should be_kind_of(User)
     subject.user.should_not be_new_record
   end
 end
 
-describe "a built instance with :method => :build" do
+describe "a stubbed instance with :method => :build" do
   include FactoryGirl::Syntax::Methods
 
   before do
@@ -51,15 +51,15 @@ describe "a built instance with :method => :build" do
     end
   end
 
-  subject { build(:post) }
+  subject { build_stubbed(:post) }
 
-  it "isn't saved" do
-    should be_new_record
+  it "acts as if it is saved in the database" do
+    should_not be_new_record
   end
 
-  it "assigns but does not save associations" do
+  it "assigns associations and acts as if it is saved" do
     subject.user.should be_kind_of(User)
-    subject.user.should be_new_record
+    subject.user.should_not be_new_record
   end
 
 end
